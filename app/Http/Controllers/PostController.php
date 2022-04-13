@@ -4,43 +4,64 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Post;
+use App\Models\User;
+
 class PostController extends Controller
 {
-   private $posts = [
-       ['id' => 1, 'title' => 'first post', 'posted_by' => 'nehal', 'created_at' => '2022-04-11'],
-       ['id' => 2, 'title' => 'second post', 'posted_by' => 'mohsen', 'created_at' => '2022-04-11'],
-       ['id' => 3, 'title' => 'third post', 'posted_by' => 'lotfy', 'created_at' => '2022-04-11'],
 
-   ];
     public function index()
-    {
+    { 
 
-       return view('posts.index',['allPosts'=>$this->posts]);
+        $posts=post::all();
+        
+       // post::othermethodes();
+        //dd($posts);
+    $postss = post::paginate(15);
+
+   // {{ $users->links() }}
+
+       return view('posts.index',['allPosts'=>$postss]);
 
 
     }
 
     public function create()
     {
-        return view('posts.create');
+        $users = user::all();
+        return view('posts.create',[
+            'users'=>$users,
+                ]);
     }
 
     public function store()
     {
-        $postData=request()->all();
 
-        $post=[
-            "id"=>count($this->posts )+1,
-            "title" => request()["title"],
-            "posted_by" => request()['postedby'],
-            "created_at" => request()['createdat']
-        ];
+        $data = request()->all();
+        //dd($data);
+
+        post::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'user_id'=>$data['post_creator'],
+            //'created_at' => $data['created_at'],
+        ]);
+
+        return to_route('posts.index');
+    //     $postData=request()->all();
+
+    //     $post=[
+    //         "id"=>count($this->posts )+1,
+    //         "title" => request()["title"],
+    //         "posted_by" => request()['postedby'],
+    //         "created_at" => request()['createdat']
+    //     ];
 
 
-       array_push($this->posts,$post);
+    //    array_push($this->posts,$post);
 
 
-         return view('posts.index',['allPosts' => $this->posts]);
+    //      return view('posts.index',['allPosts' => $this->posts]);
 
 
 
@@ -48,51 +69,71 @@ class PostController extends Controller
 
     public function show($post)
     {
-        foreach($this->posts as $p){
-            if($p['id']==$post){
-                return view('posts.show',['post'=>$p]);
-            }
-        }
-        return abort(404);
+        $dbpost= post::find($post);
+        //dd($dbpost);
+        return view('posts.show',['post'=>$dbpost]);
+        // foreach($this->posts as $p){
+        //     if($p['id']==$post){
+        //         return view('posts.show',['post'=>$p]);
+        //     }
+        // }
+        // return abort(404);
     }
 
     public function edit($id){
 
-
-        foreach($this->posts as $p){
-            if($p['id']==$id){
-                return view('posts.edit',['post'=>$p]);
-            }
-        }
-        return abort(404);
+        $postShow = Post::find($id);
+        $users = User::all();
+        return view('posts.edit', [
+            "postShow" => $postShow,
+            "users" => $users
+        ]);
+        // foreach($this->posts as $p){
+        //     if($p['id']==$id){
+        //         return view('posts.edit',['post'=>$p]);
+        //     }
+        // }
+        // return abort(404);
     }
 
-    public function update($id,Request $request){
+       public function update($id){
        
-        $post=$request->all();
+        $updatedPost = Post::find($id);
+        $data = request()->post();
+        $updatedPost->title = $data['title'];
+        //$updatedPost->description = $data['description'];
+        $updatedPost->user_id = $data['post_creator'];
+        $updatedPost->save();
+        return to_route('posts.index');
+    
+    //     $post=$request->all();
 
-        foreach($this->posts as $p){
-            if($p['id']==$id){
-                $p = $request->all();
-               break; 
-            }
-        }
+    //     foreach($this->posts as $p){
+    //         if($p['id']==$id){
+    //             $p = $request->all();
+    //            break; 
+    //         }
+    //     }
 
-        dd($this->posts);
+    //     dd($this->posts);
         
-        // $this->posts[$id]=$post;
+    //     // $this->posts[$id]=$post;
 
-        return view('posts.index',['allPosts' => $this->posts]);
-       
+    //     return view('posts.index',['allPosts' => $this->posts]);
+      // return "updated";
 
     }
 
 
     public function destroy ($id){
 
-        unset($this->posts[$id]);
+        $user = Post::find($id);
+        $user->delete();
+        return to_route('posts.index'); 
 
-       return view('posts.index',['allPosts' => $this->posts]);
+    //     unset($this->posts[$id]);
+
+    //    return view('posts.index',['allPosts' => $this->posts]);
 
        }
 }
