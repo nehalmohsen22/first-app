@@ -3,26 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Models\Post;
+use App\Models\post;
 use App\Models\User;
+use app\Http\Requests\StorePostRequest;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
 
+    
     public function index()
-    { 
-
-        $posts=post::all();
+    {
         
-       // post::othermethodes();
-        //dd($posts);
-    $postss = post::paginate(15);
 
-   // {{ $users->links() }}
-
-       return view('posts.index',['allPosts'=>$postss]);
-
+       $posts=post::all();
+       $postspag = post::paginate(15);
+       return view('posts.index',['allPosts'=>$postspag]);
 
     }
 
@@ -37,6 +33,12 @@ class PostController extends Controller
     public function store()
     {
 
+         request()->validate([
+             'title' => ['required' , 'unique:posts' , 'min:3'],
+             'description'=>['required', 'min:10'],
+           'post_creator'=> ['required','exists:users,id']
+         ]);
+
         $data = request()->all();
         //dd($data);
 
@@ -44,24 +46,11 @@ class PostController extends Controller
             'title' => $data['title'],
             'description' => $data['description'],
             'user_id'=>$data['post_creator'],
-            //'created_at' => $data['created_at'],
+        
         ]);
 
         return to_route('posts.index');
-    //     $postData=request()->all();
-
-    //     $post=[
-    //         "id"=>count($this->posts )+1,
-    //         "title" => request()["title"],
-    //         "posted_by" => request()['postedby'],
-    //         "created_at" => request()['createdat']
-    //     ];
-
-
-    //    array_push($this->posts,$post);
-
-
-    //      return view('posts.index',['allPosts' => $this->posts]);
+    
 
 
 
@@ -70,14 +59,9 @@ class PostController extends Controller
     public function show($post)
     {
         $dbpost= post::find($post);
-        //dd($dbpost);
+      
         return view('posts.show',['post'=>$dbpost]);
-        // foreach($this->posts as $p){
-        //     if($p['id']==$post){
-        //         return view('posts.show',['post'=>$p]);
-        //     }
-        // }
-        // return abort(404);
+      
     }
 
     public function edit($id){
@@ -88,40 +72,25 @@ class PostController extends Controller
             "postShow" => $postShow,
             "users" => $users
         ]);
-        // foreach($this->posts as $p){
-        //     if($p['id']==$id){
-        //         return view('posts.edit',['post'=>$p]);
-        //     }
-        // }
-        // return abort(404);
+      
     }
 
        public function update($id){
-       
         $updatedPost = Post::find($id);
+        request()->validate([
+            'title' => "required|unique:posts,title,{$updatedPost->id}|min:3",
+            'description' => ['required', 'min:10'],
+            'post_creator' => 'required|exists:users,id'
+        ]);
+
+       
+      
         $data = request()->post();
         $updatedPost->title = $data['title'];
-        //$updatedPost->description = $data['description'];
         $updatedPost->user_id = $data['post_creator'];
         $updatedPost->save();
         return to_route('posts.index');
     
-    //     $post=$request->all();
-
-    //     foreach($this->posts as $p){
-    //         if($p['id']==$id){
-    //             $p = $request->all();
-    //            break; 
-    //         }
-    //     }
-
-    //     dd($this->posts);
-        
-    //     // $this->posts[$id]=$post;
-
-    //     return view('posts.index',['allPosts' => $this->posts]);
-      // return "updated";
-
     }
 
 
@@ -131,9 +100,7 @@ class PostController extends Controller
         $user->delete();
         return to_route('posts.index'); 
 
-    //     unset($this->posts[$id]);
-
-    //    return view('posts.index',['allPosts' => $this->posts]);
+  
 
        }
 }
