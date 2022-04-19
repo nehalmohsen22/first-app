@@ -12,8 +12,9 @@
                 <th scope="col">id</th>
                 <th scope="col">Title</th>
                 <th scope="col">Posted By</th>
-               
+                <th scope="col">slug</th>
                 <th scope="col">Created At</th>
+                <th scope="col">image</th>
                 <th scope="col" style="text-align: center">Actions</th>
               </tr>
             </thead>
@@ -23,8 +24,9 @@
                 <td>{{$post->id}}</th>
                 <td>{{$post->title}}</td>
                 <td>{{$post->user ? $post->user->name : 'not found'}}</td>
-               
+                <td>{{$post->slug}}</td>
                 <td>{{$post['created_at']->format('Y-m-d')}}</td>
+                <td><img  width="100px" height="50px" src='{{asset("/storage/images/posts/".$post->image)}}' /></td>
                 <td style="text-align: center">
                     <a href="{{route('posts.show', $post['id'])}}"class="btn btn-info">View</a>
                     <a href="{{route('posts.edit', $post['id'])}}" class="btn btn-primary">Edit</a>

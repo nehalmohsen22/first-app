@@ -12,6 +12,8 @@
   <div class="card-header">Post Creator Info</div>
   <div class="card-body">
       <div class="p-2">
+        <div>
+      <img  width="150px" height="100px" src='{{asset("/storage/images/posts/".$post->image)}}' /> </div>
        <h5 class="card-title" style="font-size:18px;display:inline;">Title:-</h5>
        <p class="card-text" style="display:inline;">{{$post["title"]}}</p>
       </div>

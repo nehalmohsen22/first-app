@@ -31,7 +31,8 @@ class PostController extends Controller
     }
 
     public function store()
-    {
+    {  
+    
 
          request()->validate([
              'title' => ['required' , 'unique:posts' , 'min:3'],
@@ -40,12 +41,22 @@ class PostController extends Controller
          ]);
 
         $data = request()->all();
-        //dd($data);
 
+          $req = request()->hasFile('image');
+        if($req){
+            $destination_path = 'public/images/posts';
+            $image = request()->file('image');
+            $image_name = $image->getClientOriginalName();
+            $path = request()->file('image')->storeAs($destination_path,$image_name);
+            $data['image'] = $image_name;
+        }
+      
+    
         post::create([
             'title' => $data['title'],
             'description' => $data['description'],
             'user_id'=>$data['post_creator'],
+             'image'=>$data['image'],
         
         ]);
 

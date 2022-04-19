@@ -5,7 +5,7 @@
 @section('content')
 
 
-      <form method="POST" action="{{route('posts.store')}}" class="mt-5">
+      <form method="POST" action="{{route('posts.store')}}"  enctype="multipart/form-data" class="mt-5">
         @csrf
 
         <div class="mb-3">
@@ -16,6 +16,12 @@
             <label for="exampleFormControlInput1" class="form-label">description</label>
             <textarea name="description" class="form-control" id="exampleFormControlInput1" ></textarea>
           </div>
+
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">upload image</label>
+            <input name="image" type="file" class="form-control" id="exampleFormControlInput1">
+          </div>
+
           <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">'posted By'</label>
             <select class="form-control" name="post_creator" >
